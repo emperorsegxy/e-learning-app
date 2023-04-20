@@ -4,7 +4,12 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const CONNECT_URI = process.env.MONGO_URI as string
-console.log(CONNECT_URI)
-const connectDB = () => mongoose.connect(CONNECT_URI).then(r => console.log('db connected...'))
+let connectDB: () => Promise<typeof mongoose>
+try {
+    connectDB = async () => await mongoose.connect(CONNECT_URI)
+} catch (e: any) {
+    console.error(e.message)
+    process.exit()
+}
 
 export default connectDB
