@@ -1,14 +1,8 @@
 import jwt from 'jsonwebtoken'
-import {NextFunction, Request, Response} from "express";
+import {NextFunction, Request, RequestHandler, Response} from "express";
 import dotenv from "dotenv";
 
 dotenv.config()
-
-declare module "express" {
-    interface Request {
-        decodedAuth: string | jwt.JwtPayload
-    }
-}
 
 const VerifyUser = (req: Request, res: Response, next: NextFunction) => {
     const retrieveTokenFromHeaders = () : string | undefined => {
@@ -21,6 +15,7 @@ const VerifyUser = (req: Request, res: Response, next: NextFunction) => {
     }
     if (token) {
         try {
+            // @ts-ignore
             req.decodedAuth = jwt.verify(token, process.env.JWT_TOKEN_KEY as string)
         } catch (e: any) {
             return res.status(401).send('Invalid token')
@@ -30,4 +25,4 @@ const VerifyUser = (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export default VerifyUser
+export default VerifyUser as RequestHandler

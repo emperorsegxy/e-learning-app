@@ -1,10 +1,11 @@
-import express, {RequestHandler} from "express";
+import express from "express";
 import registerNewUser from "../services/auth/registerNewUser";
 import {loginValidation, registerValidation} from "../validations/dtos/auth";
 import getErrorMsg from "../error-handlers/joi-handler";
 import logUserIn from "../services/auth/logUserIn";
 import VerifyUser from "../middleware/VerifyUser";
 import {getAllUsers} from "../services/users";
+import {JwtPayload} from "jsonwebtoken";
 
 const router = express.Router()
 
@@ -35,12 +36,9 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.get('/users', VerifyUser as RequestHandler, async (req, res) => {
+router.get('/users', VerifyUser, async (req, res) => {
     // @ts-ignore
-    console.log(req.decodedAuth)
-    // @ts-ignore
-    const users = await getAllUsers(req.decodedAuth.id)
-    console.log(users)
+    const users = await getAllUsers((req.decodedAuth as JwtPayload)?.id)
     res.send(users)
 })
 

@@ -1,21 +1,21 @@
-import express, {RequestHandler} from "express";
+import express, {Response} from "express";
 import {courseCreationValidation} from "../validations/dtos/course";
 import getErrorMsg from "../error-handlers/joi-handler";
 import {createCourse, deleteACourse, deleteCourses, updateCourse} from "../services/course";
 import ICourse from "../interfaces/ICourse";
 import CourseError from "../validations/errors/CourseError";
 import verifyUser from "../middleware/VerifyUser";
+import {JwtPayload} from "jsonwebtoken";
 
 const courseRouter = express.Router()
 
-courseRouter.post('/', verifyUser as RequestHandler, async (req, res) => {
+courseRouter.post('/', verifyUser, async (req, res) => {
     const course: ICourse = req.body
     const { error } = courseCreationValidation(course)
     if (error) {
         res.status(400).send(getErrorMsg(error))
     }
-    // @ts-ignore
-    const owner = req.decodedAuth.id
+    const owner = (req.decodedAuth as JwtPayload)?.id
     try {
        const savedCourse = await createCourse(course, owner)
         return res.status(201).send({
@@ -30,7 +30,7 @@ courseRouter.post('/', verifyUser as RequestHandler, async (req, res) => {
     }
 })
 
-courseRouter.put('/:id', verifyUser as RequestHandler, async (req, res) => {
+courseRouter.put('/:id', verifyUser, async (req, res) => {
     if (!req.params.id) {
         return res.status(400).send({ message: "You have not passed in the 'id' of the course to be updated" })
     }
@@ -41,8 +41,7 @@ courseRouter.put('/:id', verifyUser as RequestHandler, async (req, res) => {
         return res.status(400).send({ message: "There must be at least a property being changed" })
     }
     try {
-        // @ts-ignore
-        await updateCourse(req.params.id, req.body, req.decodedAuth.id)
+        await updateCourse(req.params.id, req.body, (req.decodedAuth as JwtPayload)?.id)
         return res.status(200).send({
             message: 'Successfully modified given course'
         })
@@ -55,13 +54,12 @@ courseRouter.put('/:id', verifyUser as RequestHandler, async (req, res) => {
     }
 })
 
-courseRouter.delete('/:id', verifyUser as RequestHandler, async (req, res) => {
+courseRouter.delete('/:id', verifyUser, async (req, res) => {
     if (!req.params.id) {
         return res.status(400).send({ message: "You have not passed in the 'id' of the course to be deleted" })
     }
     try {
-        // @ts-ignore
-        await deleteACourse(req.params.id, req.decodedAuth.id)
+        await deleteACourse(req.params.id, (req.decodedAuth as JwtPayload)?.id)
         return res.status(200).send({
             message: 'Successfully deleted course'
         })
@@ -74,11 +72,10 @@ courseRouter.delete('/:id', verifyUser as RequestHandler, async (req, res) => {
     }
 })
 
-courseRouter.delete('/', verifyUser as RequestHandler, async (req, res) => {
+courseRouter.delete('/', verifyUser, async (req, res: Response) => {
     const coursesIds = (req.query.courses as string)?.split(',') ?? []
     try {
-        // @ts-ignore
-        await deleteCourses(req.decodedAuth.id, coursesIds)
+        await deleteCourses((req.decodedAuth as JwtPayload)?.id, coursesIds)
         res.send({ message: "Successfully deleted courses" })
     } catch (e: any) {
         if (e.name === CourseError.name) {

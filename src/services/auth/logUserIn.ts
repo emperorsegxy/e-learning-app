@@ -9,7 +9,6 @@ const isSamePasswordCorrect = async (password: string, savePassword: string) => 
 
 const logUserIn = async (user: LoginPayload) => {
     const _user = await User.findOne({ email: user.email }).exec()
-    console.log(_user)
     if (!_user) throw new Error("User does not exist")
     if (!await isSamePasswordCorrect(user.password, _user?.password!)) throw new Error("Combination is bad")
     try {
