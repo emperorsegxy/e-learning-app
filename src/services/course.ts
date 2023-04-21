@@ -16,3 +16,17 @@ export const createCourse = async (course: ICourse, ownerId: string) => {
         throw new CourseError('An error occurred trying to create a course')
     }
 }
+
+
+export const updateCourse = async (courseId: string, course: ICourse, ownerId: string) => {
+    const existingCourse = await Course.findById(courseId).exec()
+    console.log(existingCourse)
+    if (!existingCourse) {
+        throw new CourseError("There's no course with the provided id", 400)
+    }
+    if (existingCourse.owner !== ownerId) {
+        throw new CourseError("Course details can only be updated by owner")
+    }
+    console.log(course)
+    await Course.findByIdAndUpdate(courseId, { title: course.title })
+}

@@ -1,7 +1,7 @@
 import express, {RequestHandler} from "express";
 import {courseCreationValidation} from "../validations/dtos/course";
 import getErrorMsg from "../error-handlers/joi-handler";
-import {createCourse} from "../services/course";
+import {createCourse, updateCourse} from "../services/course";
 import ICourse from "../interfaces/ICourse";
 import CourseError from "../validations/errors/CourseError";
 import verifyUser from "../middleware/VerifyUser";
@@ -27,6 +27,31 @@ courseRouter.post('/', verifyUser as RequestHandler, async (req, res) => {
            return res.status(e.status).send(e.message)
         }
         return res.status(500).send('An error occurred')
+    }
+})
+
+courseRouter.put('/:id', verifyUser as RequestHandler, async (req, res) => {
+    if (!req.params.id) {
+        return res.status(400).send({ message: "You have not passed in the 'id' of the course to be updated" })
+    }
+    if (!req.body) {
+        return res.status(400).send({ message: "payload cannot be empty" })
+    }
+    if (!req.body.title && !req.body.description) {
+        return res.status(400).send({ message: "There must be at least a property being changed" })
+    }
+    try {
+        // @ts-ignore
+        await updateCourse(req.params.id, req.body, req.decodedAuth.id)
+        return res.status(200).send({
+            message: 'Successfully modified given course'
+        })
+    } catch (e: any) {
+        if (e.name === CourseError.name) {
+            const { status, message } = e
+            return res.status(status).send({ message })
+        }
+        return res.status(500).send(e.message || 'An error occurred')
     }
 })
 
