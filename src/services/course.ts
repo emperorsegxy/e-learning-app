@@ -1,6 +1,9 @@
 import Course from "../db/Course";
 import ICourse from "../interfaces/ICourse";
 import CourseError from "../validations/errors/CourseError";
+import {deleteModulesBelongingToCourse} from "./module";
+
+const isCourseOwner = (ownerId: string, confirmingId: string) => ownerId === confirmingId
 
 export const createCourse = async (course: ICourse, ownerId: string) => {
     const title = course.title
@@ -20,13 +23,29 @@ export const createCourse = async (course: ICourse, ownerId: string) => {
 
 export const updateCourse = async (courseId: string, course: ICourse, ownerId: string) => {
     const existingCourse = await Course.findById(courseId).exec()
-    console.log(existingCourse)
     if (!existingCourse) {
         throw new CourseError("There's no course with the provided id", 400)
     }
-    if (existingCourse.owner !== ownerId) {
-        throw new CourseError("Course details can only be updated by owner")
+    if (!isCourseOwner(existingCourse.owner!, ownerId)) {
+        throw new CourseError("Course details can only be updated by owner", 403)
     }
-    console.log(course)
     await Course.findByIdAndUpdate(courseId, { title: course.title })
+}
+
+export const deleteACourse = async (courseId: string, ownerId: string) => {
+    const course = await Course.findById(courseId).exec()
+    if (!course) throw new CourseError('There\'s no course with provided id', 400)
+    if (!isCourseOwner(course.owner!, ownerId)) throw new CourseError('Course can only be deleted by owner', 403)
+    deleteModulesBelongingToCourse(courseId).catch((e: any) => console.error(e))
+    await Course.findByIdAndDelete(courseId)
+}
+
+export const deleteCourses = async (ownerId: string, coursesIds: string[] = []) => {
+    if (!coursesIds || coursesIds.length) {
+        const courses = await Course.find({}).exec()
+        coursesIds = courses.map(course => course.id)
+    }
+    for (const coursesId of coursesIds) {
+        await deleteACourse(coursesId, ownerId)
+    }
 }
