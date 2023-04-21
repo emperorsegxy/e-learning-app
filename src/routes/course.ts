@@ -1,7 +1,7 @@
 import express, {RequestHandler} from "express";
 import {courseCreationValidation} from "../validations/dtos/course";
 import getErrorMsg from "../error-handlers/joi-handler";
-import {createCourse, updateCourse} from "../services/course";
+import {createCourse, deleteACourse, deleteCourses, updateCourse} from "../services/course";
 import ICourse from "../interfaces/ICourse";
 import CourseError from "../validations/errors/CourseError";
 import verifyUser from "../middleware/VerifyUser";
@@ -46,6 +46,40 @@ courseRouter.put('/:id', verifyUser as RequestHandler, async (req, res) => {
         return res.status(200).send({
             message: 'Successfully modified given course'
         })
+    } catch (e: any) {
+        if (e.name === CourseError.name) {
+            const { status, message } = e
+            return res.status(status).send({ message })
+        }
+        return res.status(500).send(e.message || 'An error occurred')
+    }
+})
+
+courseRouter.delete('/:id', verifyUser as RequestHandler, async (req, res) => {
+    if (!req.params.id) {
+        return res.status(400).send({ message: "You have not passed in the 'id' of the course to be deleted" })
+    }
+    try {
+        // @ts-ignore
+        await deleteACourse(req.params.id, req.decodedAuth.id)
+        return res.status(200).send({
+            message: 'Successfully deleted course'
+        })
+    } catch (e: any) {
+        if (e.name === CourseError.name) {
+            const { status, message } = e
+            return res.status(status).send({ message })
+        }
+        return res.status(500).send(e.message || 'An error occurred')
+    }
+})
+
+courseRouter.delete('/', verifyUser as RequestHandler, async (req, res) => {
+    const coursesIds = (req.query.courses as string)?.split(',') ?? []
+    try {
+        // @ts-ignore
+        await deleteCourses(req.decodedAuth.id, coursesIds)
+        res.send({ message: "Successfully deleted courses" })
     } catch (e: any) {
         if (e.name === CourseError.name) {
             const { status, message } = e
