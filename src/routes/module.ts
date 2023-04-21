@@ -12,8 +12,9 @@ moduleRouter.post(`/:courseId`, VerifyUser as RequestHandler, async (req, res) =
             message: 'Successfully created a module',
             module: savedModule
         })
-    } catch (e) {
-        res.send(e)
+    } catch (e: any) {
+        console.error(e)
+        res.send(e.message)
     }
 })
 
