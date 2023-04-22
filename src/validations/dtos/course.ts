@@ -6,6 +6,5 @@ export const courseCreationValidation = (course: ICourse) => {
         title: Joi.string().required().min(5).max(140),
         description: Joi.string().min(15).max(255)
     })
-
     return schema.validate(course)
 }
