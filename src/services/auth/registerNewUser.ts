@@ -11,12 +11,10 @@ const securePassword = async (password: string) => {
 const registerNewUser = async (user: any) => {
     if (await isEmailAvailable(user.email)) {
         user.password = await securePassword(user.password)
-        console.log(user.password)
         const _user = new User(user)
         try {
             await _user.save()
         } catch (e: any) {
-            console.log(e)
             throw e
         }
     } else {

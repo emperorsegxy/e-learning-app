@@ -1,4 +1,4 @@
-import VerifyUser from "../middleware/VerifyUser";
+import VerifyUser from "../middlewares/VerifyUser";
 import {createModule, doesTypeAndContentMatch} from "../services/module";
 import {JwtPayload} from "jsonwebtoken";
 import {Router} from "express";

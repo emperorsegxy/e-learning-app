@@ -4,7 +4,7 @@ import getErrorMsg from "../error-handlers/joi-handler";
 import {createCourse, deleteACourse, deleteCourses, updateCourse} from "../services/course";
 import ICourse from "../interfaces/ICourse";
 import CourseError from "../validations/errors/CourseError";
-import verifyUser from "../middleware/VerifyUser";
+import verifyUser from "../middlewares/VerifyUser";
 import {JwtPayload} from "jsonwebtoken";
 
 const courseRouter = express.Router()

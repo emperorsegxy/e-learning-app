@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import {genContentType} from "./modules";
+import Logger from "./logger";
 
 dotenv.config()
 
@@ -35,9 +36,9 @@ const uploadFileToCloudinary = async ({ filePath, fileType, folder }: UploadFile
     if (!filePath) throw new CloudinaryError('File path must not be empty')
     const cloudinaryUploadResponse = await uploadFile(filePath, fileType, folder)
     const resolvedPath = path.resolve(filePath)
-    fs.rm(resolvedPath, (err) => {
-        if (err) return console.error('SILENT_FAILURE:: Failed to remove uploaded file')
-        console.info('CLOUDINARY_UPLOADER:: Removed uploaded image file from disk')
+    fs.rmdir(resolvedPath, (err) => {
+        if (err) return Logger.error('SILENT_FAILURE:: Failed to remove uploaded file')
+        Logger.info('CLOUDINARY_UPLOADER:: Removed uploaded image file from disk', { label: 'removed file' })
     })
     return new CloudinaryUploadResponse(cloudinaryUploadResponse)
 }

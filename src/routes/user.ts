@@ -3,7 +3,7 @@ import registerNewUser from "../services/auth/registerNewUser";
 import {loginValidation, registerValidation} from "../validations/dtos/auth";
 import getErrorMsg from "../error-handlers/joi-handler";
 import logUserIn from "../services/auth/logUserIn";
-import VerifyUser from "../middleware/VerifyUser";
+import VerifyUser from "../middlewares/VerifyUser";
 import {getAllUsers} from "../services/users";
 import {JwtPayload} from "jsonwebtoken";
 
