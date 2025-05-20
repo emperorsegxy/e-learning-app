@@ -6,6 +6,8 @@ import logUserIn from "../services/auth/logUserIn";
 import VerifyUser from "../middlewares/VerifyUser";
 import {getAllUsers} from "../services/users";
 import {JwtPayload} from "jsonwebtoken";
+import ApiBaseErrorResponse from "../utils/errors/ApiBaseErrorResponse";
+import HTTP_STATUS from "../utils/httpStatus";
 
 const router = express.Router()
 
@@ -18,7 +20,7 @@ router.post('/register', async (req, res) => {
         await registerNewUser(req.body)
         res.status(201).send({message: 'Successfully registered user'})
     } catch (e: any) {
-        res.status(400).send(e.message)
+        res.status(400).send(ApiBaseErrorResponse(HTTP_STATUS.BAD_REQUEST, e))
     }
 })
 

@@ -3,5 +3,7 @@ export default interface IUserRegisterPayload {
     lastName: string,
     email: string,
     password: string,
-    userType: "creator" | "learner",
+    userType: UserType,
 }
+
+export type UserType = "creator" | "learner"

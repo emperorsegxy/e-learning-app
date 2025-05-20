@@ -7,12 +7,14 @@ import moduleRouter from "./routes/module";
 import Logger from "./utils/logger";
 import morganMiddleware from "./middlewares/morganMiddleware";
 import {Error} from "mongoose";
+import cors from "cors";
 const {MongooseServerSelectionError} = Error
 
 dotenv.config()
 
 const PORT = process.env.PORT as string
 const app = express()
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morganMiddleware)

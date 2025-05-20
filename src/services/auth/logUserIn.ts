@@ -12,10 +12,14 @@ const logUserIn = async (user: LoginPayload) => {
     if (!_user) throw new Error("User does not exist")
     if (!await isSamePasswordCorrect(user.password, _user?.password!)) throw new Error("Combination is bad")
     try {
+        const {firstName, lastName, createdAt} = _user
         const userData = {
             id: _user._id!,
             email: user.email,
             userType: _user?.userType,
+            firstName,
+            lastName,
+            dateJoined: createdAt.toISOString(),
         }
         const token = jwt.sign(userData, process.env.JWT_TOKEN_KEY as string, { algorithm: 'HS256' })
         return {
