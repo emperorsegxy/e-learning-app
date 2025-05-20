@@ -4,7 +4,7 @@ const { printf, timestamp, combine, colorize } = format
 
 const customFormat =
     printf(({ level, message, label, timestamp }) => {
-        label = `${!!label ? `[${label.toUpperCase()}]` : ''}`
+        // label = `${!!label ? `[${label.toUpperCase()}]` : ''}`
         return `${timestamp} ${label} ${level}: ${message}`.trim()
     })
 

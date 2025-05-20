@@ -4,7 +4,11 @@ import Logger, {LoggerLevel} from "../utils/logger";
 
 dotenv.config()
 
+console.log(process.env)
+
 const CONNECT_URI = process.env.MONGO_URI as string
+
+console.log(CONNECT_URI, 'connecting to mongodb')
 
 export default async () => await mongoose.connect(CONNECT_URI)
 

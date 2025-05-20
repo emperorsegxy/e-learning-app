@@ -6,6 +6,7 @@ export const registerValidation = (user: any) => {
         firstName: Joi.string().required().min(3),
         lastName: Joi.string().required().min(3),
         email: Joi.string().email().required(),
+        userType: Joi.string().required(),
         password: Joi.string().required().min(8)
     })
     return schema.validate(user)

@@ -1,5 +1,6 @@
 import User from "../../db/User";
 import bcryptjs from 'bcryptjs'
+import IUserRegisterPayload from "../../interfaces/IUserRegisterPayload";
 
 const isEmailAvailable = async (email: string) => !await User.findOne({email}).exec()
 
@@ -8,7 +9,7 @@ const securePassword = async (password: string) => {
     return await bcryptjs.hash(password, salt)
 }
 
-const registerNewUser = async (user: any) => {
+const registerNewUser = async (user: IUserRegisterPayload) => {
     if (await isEmailAvailable(user.email)) {
         user.password = await securePassword(user.password)
         const _user = new User(user)
