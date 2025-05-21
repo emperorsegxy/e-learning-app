@@ -19,3 +19,11 @@ export const loginValidation = (user: LoginPayload) => {
     })
     return schema.validate(user)
 }
+
+export const verifyEmailValidation = (otpPayload: any) => {
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+        otp: Joi.string().required().min(4).max(4),
+    })
+    return schema.validate(otpPayload)
+}

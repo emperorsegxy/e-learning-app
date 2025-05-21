@@ -1,6 +1,7 @@
 import User from "../../db/User";
 import bcryptjs from 'bcryptjs'
 import IUserRegisterPayload, {UserType} from "../../interfaces/IUserRegisterPayload";
+import {sendOTP} from "./manageOTP";
 
 const isEmailAvailable = async (email: string) => !await User.findOne({email}).exec()
 
@@ -17,6 +18,8 @@ const registerNewUser = async (user: IUserRegisterPayload) => {
         const _user = new User(user)
         try {
             await _user.save()
+            const {otp} = await sendOTP(user)
+            return otp
         } catch (e: any) {
             throw e
         }

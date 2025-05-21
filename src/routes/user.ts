@@ -1,13 +1,14 @@
 import express from "express";
 import registerNewUser from "../services/auth/registerNewUser";
-import {loginValidation, registerValidation} from "../validations/dtos/auth";
+import {loginValidation, registerValidation, verifyEmailValidation} from "../validations/dtos/auth";
 import getErrorMsg from "../error-handlers/joi-handler";
 import logUserIn from "../services/auth/logUserIn";
 import VerifyUser from "../middlewares/VerifyUser";
 import {getAllUsers} from "../services/users";
 import {JwtPayload} from "jsonwebtoken";
 import ApiBaseErrorResponse from "../utils/errors/ApiBaseErrorResponse";
-import HTTP_STATUS from "../utils/httpStatus";
+import {verifyOTP} from "../services/auth/manageOTP";
+import HttpStatus from "../utils/httpStatus";
 
 const router = express.Router()
 
@@ -17,10 +18,10 @@ router.post('/register', async (req, res) => {
         return res.status(400).send(getErrorMsg(error))
     }
     try {
-        await registerNewUser(req.body)
-        res.status(201).send({message: 'Successfully registered user'})
+        const otp = await registerNewUser(req.body)
+        res.status(HttpStatus.CREATED).send({message: 'Successfully registered user', data: {otp}})
     } catch (e: any) {
-        res.status(400).send(ApiBaseErrorResponse(HTTP_STATUS.BAD_REQUEST, e))
+        res.status(400).send(ApiBaseErrorResponse(HttpStatus.BAD_REQUEST, e))
     }
 })
 
@@ -34,7 +35,20 @@ router.post('/login', async (req, res) => {
         res.send(response)
     } catch (e: any) {
         console.error(e)
-        res.status(400).send(e.message)
+        res.status(HttpStatus.BAD_REQUEST).send(ApiBaseErrorResponse(HttpStatus.BAD_REQUEST, e))
+    }
+})
+
+router.post('/verify-email', async (req, res) => {
+    const body = req.body
+    const { error } = verifyEmailValidation(body)
+    if (error)
+        return res.send(HttpStatus.BAD_REQUEST).send({message: getErrorMsg(error)})
+    try {
+        await verifyOTP(body)
+        res.status(HttpStatus.OK).send({message: 'Successfully verified email'})
+    } catch (e: any) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(ApiBaseErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e))
     }
 })
 
