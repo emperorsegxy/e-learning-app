@@ -13,8 +13,6 @@ const validateUserType = (userType: UserType) => ['creator', 'learner'].includes
 
 const registerNewUser = async (user: IUserRegisterPayload) => {
     if (await isEmailAvailable(user.email)) {
-        if (!validateUserType(user.userType))
-            throw new Error('Invalid user type selected.')
         user.password = await securePassword(user.password)
         const _user = new User(user)
         try {
