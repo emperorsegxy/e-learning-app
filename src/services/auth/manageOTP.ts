@@ -27,7 +27,7 @@ export const sendOTP = async ({ email }: { email: string }) => {
 }
 
 export const verifyOTP = async ({ email, otp }: { email: string ; otp: string }) => {
-    const otpExists = await OTP.findOne({ email })
+    const otpExists = await OTP.findOne({ email }).sort({ createdAt: -1 }).limit(1)
     if (otpExists) {
         if (otpExists.otp === otp)
             await User.updateOne({ email }, { hasVerifiedEmail: true})
