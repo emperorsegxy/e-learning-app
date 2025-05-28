@@ -27,3 +27,12 @@ export const verifyEmailValidation = (otpPayload: any) => {
     })
     return schema.validate(otpPayload)
 }
+
+export const resetPasswordValidation = (otpPayload: any) => {
+    const schema = Joi.object({
+        password: Joi.string().required().min(8),
+        sessionToken: Joi.string().required(),
+    })
+    return schema.validate(otpPayload)
+}
+
