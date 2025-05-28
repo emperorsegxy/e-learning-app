@@ -19,6 +19,7 @@ import OtpSession from "../db/OtpSession";
 import OTP from "../db/OTP";
 import User from "../db/User";
 import {securePassword} from "../utils/bcryptor";
+import {sendOtpEmail} from "../services/auth/mailService";
 
 const router = express.Router()
 
@@ -73,6 +74,11 @@ router.post('/forgot-password', async (req, res) => {
     if (!req.body.email) return res.status(HttpStatus.BAD_REQUEST).send(ApiBaseErrorResponse(HttpStatus.BAD_REQUEST, new Error('Email is empty')))
     try {
         const {otp} = await sendOTP(req.body)
+        await sendOtpEmail({
+            to: req.body.email,
+            otp,
+            purpose: 'forgot-password',
+        });
         res.status(HttpStatus.OK).send({message: 'Successfully sent otp to ' + req.body.email, data: {otp}})
     } catch (e: any) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(ApiBaseErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e))
