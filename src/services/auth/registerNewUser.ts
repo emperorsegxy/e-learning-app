@@ -18,7 +18,7 @@ const registerNewUser = async (user: IUserRegisterPayload) => {
             const {otp} = await sendOTP(user)
             const sentMailResult = sendOtpEmail(user.email,user, otp)
             console.log(sentMailResult)
-            return { message: 'User registered, OTP sent' };
+            return { message: 'User registered, OTP sent', data: otp };
         } catch (e: any) {
             throw e
         }
