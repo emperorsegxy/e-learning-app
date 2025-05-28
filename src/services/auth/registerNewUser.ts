@@ -2,13 +2,10 @@ import User from "../../db/User";
 import bcryptjs from 'bcryptjs'
 import IUserRegisterPayload, {UserType} from "../../interfaces/IUserRegisterPayload";
 import {sendOTP} from "./manageOTP";
+import {securePassword} from "../../utils/bcryptor";
 
 const isEmailAvailable = async (email: string) => !await User.findOne({email}).exec()
 
-const securePassword = async (password: string) => {
-    const salt = await bcryptjs.genSalt(10)
-    return await bcryptjs.hash(password, salt)
-}
 
 const validateUserType = (userType: UserType) => ['creator', 'learner'].includes(userType)
 
