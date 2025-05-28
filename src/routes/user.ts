@@ -28,8 +28,8 @@ router.post('/register', async (req, res) => {
         return res.status(400).send(getErrorMsg(error))
     }
     try {
-        const otp = await registerNewUser(req.body)
-        res.status(HttpStatus.CREATED).send({message: 'Successfully registered user', data: {otp}})
+        await registerNewUser(req.body)
+        res.status(HttpStatus.CREATED).send({message: 'OTP sent to your email', data: req.body})
     } catch (e: any) {
         res.status(400).send(ApiBaseErrorResponse(HttpStatus.BAD_REQUEST, e))
     }
