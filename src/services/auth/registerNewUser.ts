@@ -1,13 +1,13 @@
 import User from "../../db/User";
-import bcryptjs from 'bcryptjs'
-import IUserRegisterPayload, {UserType} from "../../interfaces/IUserRegisterPayload";
+import IUserRegisterPayload from "../../interfaces/IUserRegisterPayload";
 import {sendOTP} from "./manageOTP";
+import {sendOtpEmail} from "./mailService";
 import {securePassword} from "../../utils/bcryptor";
 
 const isEmailAvailable = async (email: string) => !await User.findOne({email}).exec()
 
 
-const validateUserType = (userType: UserType) => ['creator', 'learner'].includes(userType)
+// const validateUserType = (userType: UserType) => ['creator', 'learner'].includes(userType)
 
 const registerNewUser = async (user: IUserRegisterPayload) => {
     if (await isEmailAvailable(user.email)) {
@@ -16,7 +16,9 @@ const registerNewUser = async (user: IUserRegisterPayload) => {
         try {
             await _user.save()
             const {otp} = await sendOTP(user)
-            return otp
+            const sentMailResult = sendOtpEmail(user.email,user, otp)
+            console.log(sentMailResult)
+            return { message: 'User registered, OTP sent', data: otp };
         } catch (e: any) {
             throw e
         }
