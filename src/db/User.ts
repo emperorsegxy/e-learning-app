@@ -17,7 +17,7 @@ const User = new Schema({
     userType: {
         type: String,
         required: true,
-        enum: ['learner', 'creator'],
+        enum: ['learner', 'creator', 'admin'],
     }
 }, { timestamps: true })
 export default mongoose.model('User', User)

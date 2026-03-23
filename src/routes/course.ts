@@ -41,7 +41,8 @@ courseRouter.put('/:id', verifyUser, async (req, res) => {
         return res.status(400).send({ message: "There must be at least a property being changed" })
     }
     try {
-        await updateCourse(req.params.id, req.body, (req.decodedAuth as JwtPayload)?.id)
+        const auth = req.decodedAuth as JwtPayload
+        await updateCourse(req.params.id, req.body, auth?.id, auth?.userType)
         return res.status(200).send({
             message: 'Successfully modified given course'
         })
@@ -59,7 +60,8 @@ courseRouter.delete('/:id', verifyUser, async (req, res) => {
         return res.status(400).send({ message: "You have not passed in the 'id' of the course to be deleted" })
     }
     try {
-        await deleteACourse(req.params.id, (req.decodedAuth as JwtPayload)?.id)
+        const auth = req.decodedAuth as JwtPayload
+        await deleteACourse(req.params.id, auth?.id, auth?.userType)
         return res.status(200).send({
             message: 'Successfully deleted course'
         })
@@ -75,7 +77,8 @@ courseRouter.delete('/:id', verifyUser, async (req, res) => {
 courseRouter.delete('/', verifyUser, async (req, res: Response) => {
     const coursesIds = (req.query.courses as string)?.split(',') ?? []
     try {
-        await deleteCourses((req.decodedAuth as JwtPayload)?.id, coursesIds)
+        const auth = req.decodedAuth as JwtPayload
+        await deleteCourses(auth?.id, auth?.userType, coursesIds)
         res.send({ message: "Successfully deleted courses" })
     } catch (e: any) {
         if (e.name === CourseError.name) {
